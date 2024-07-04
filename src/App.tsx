@@ -2,13 +2,24 @@ import React  from 'react';
 import { Column } from "./Column"
 import { AppContainer, CardContainer, ColumnContainer, ColumnTitle } from "./styles"
 import { AddNewItem } from './AddNewItem';
+import { useAppState } from './state/AppstateContext';
+
+import { addList } from './state/actions'
 
 export const  App = () => {
+	const { lists, dispatch } = useAppState()
 	return (
 		<AppContainer>
-			<Column text="Todo:" />
-			<AddNewItem toggleButtonText='+ Add another list'
-			onAdd={console.log}
+			{ lists.map( list => (
+				<Column text={list.text} key={list.id} id={list.id} />
+			))}
+			<AddNewItem
+				toggleButtonText='+ Add another list'
+				// onAdd={ (text) =>  dispatch(addList(text))}
+				onAdd={text => {
+					console.log(`GK in onAdd text: ${text} adding List - new Column`)
+					dispatch(addList(text))}
+				}
 			/>
 		</AppContainer>
 	)
