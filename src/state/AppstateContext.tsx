@@ -1,5 +1,6 @@
-import { createContext, useContext, Dispatch ,FC } from "react";
-import React  from 'react';
+import { createContext, useContext, useEffect, Dispatch } from "react"
+import { save } from "../api"
+import React  from 'react'
 
 import {
     appStateReducer,
@@ -10,28 +11,14 @@ import {
 import { Action } from './actions'
 import { useImmerReducer } from "use-immer";
 import { DragItem } from "../DragItem";
+import { withInitialState } from "../withInitialState"
 
 
-const appData: AppState = {
-    draggedItem: null, 
-    lists: [
-        {
-            id: "0",
-            text: "To Do",
-            tasks: [{ id: "c0", text: "Generate app scaffold" }]
-        },
-        {
-            id: "1",
-            text: "inProgress",
-            tasks: [{id: "c2", text: "Learn TypeScript"}]
-        },
-        {
-            id: "2",
-            text: "Done",
-            tasks: [{id: "c3", text: "Begin to use static typying"}]
-        }
-    ]
+type AppStateProviderProps = {
+    children: React.ReactNode
+    initialState: AppState
 }
+
 
 type AppstateContextProps = {
     draggedItem: DragItem | null
@@ -43,23 +30,35 @@ type AppstateContextProps = {
 const AppStateContext = createContext<AppstateContextProps>(
     {} as AppstateContextProps
 )
-interface Props {
-    children?: React.ReactNode
-}
-export const AppStateProvider: FC<Props> = ({ children }) => {
-    const [state, dispatch] = useImmerReducer(appStateReducer, appData)
-    const { lists,draggedItem } = state
-    const getTasksByListId = ( id: string) => {
-        return lists.find(list => list.id === id)?.tasks || []
+
+
+export const AppStateProvider = 
+withInitialState<AppStateProviderProps>(
+    ({ children, initialState}) => {
+        const [state, dispatch] = useImmerReducer(
+            appStateReducer,
+            initialState
+        )
+
+        useEffect(() => {
+            save(state)
+        },[state])
+
+        const { draggedItem, lists } = state
+        const getTasksByListId = (id: string ) => {
+            return lists.find((list) => list.id === id)?.tasks || []
+        }
+
+        return (
+            <AppStateContext.Provider 
+                value={{draggedItem, lists, getTasksByListId, dispatch}}
+                >
+                    {children}
+                </AppStateContext.Provider>
+        )
+
     }
-
-
-return ( 
-    <AppStateContext.Provider value= {{draggedItem,lists, getTasksByListId, dispatch}}>
-        {children}
-    </AppStateContext.Provider>
 )
-}
 
 export const useAppState = () => {
     return useContext(AppStateContext)
