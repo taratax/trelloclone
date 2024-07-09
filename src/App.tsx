@@ -17,11 +17,7 @@ export const  App = () => {
 			))}
 			<AddNewItem
 				toggleButtonText='+ Add another list'
-				// onAdd={ (text) =>  dispatch(addList(text))}
-				onAdd={text => {
-					console.log(`GK in onAdd text: ${text} adding List - new Column`)
-					dispatch(addList(text))}
-				}
+				onAdd={(text) => dispatch(addList(text))}
 			/>
 		</AppContainer>
 	)

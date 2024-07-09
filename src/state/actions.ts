@@ -20,6 +20,15 @@ export type Action =
     type: "SET_DRAGGED_ITEM"
     payload: DragItem | null
 }
+| {
+    type: "MOVE_TASK"
+    payload: {
+        draggedItemId: string
+        hoverItemId: string | null
+        sourceColumnId: string
+        targetColumnId: string
+    }
+}
 
 export const addTask = ( text: string, listId: string) : Action => ({
     type: "ADD_TASK",
@@ -45,6 +54,21 @@ export const moveList = (draggedId: string, hoverId: string): Action => ( {
 export const setDraggedItem = ( draggedItem: DragItem | null): Action => ({
     type: "SET_DRAGGED_ITEM",
     payload: draggedItem
+})
+
+export const moveTask = ( 
+    draggedItemId: string,
+        hoverItemId: string | null,
+        sourceColumnId: string,
+        targetColumnId: string,
+): Action => ({
+    type: "MOVE_TASK",
+    payload: {
+        draggedItemId,
+        hoverItemId,
+        sourceColumnId,
+        targetColumnId
+    }
 })
 
 // Add this line to ensure the file is treated as a module
